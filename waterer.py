@@ -1,7 +1,7 @@
 import time
 import RPi.GPIO as GPIO
 
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BCM)
 
 
 class Watererer:
@@ -31,7 +31,7 @@ class Watererer:
         start_time = time.time()
         #Discharge
         GPIO.setup(self.measure_pin, GPIO.OUT)
-        GPIO.setup(self.measure_pin, GPIO.LOw)
+        GPIO.output(self.measure_pin, GPIO.LOW)
         time.sleep(0.1)
         GPIO.setup(self.measure_pin, GPIO.IN)
         while GPIO.input(self.measure_pin) == GPIO.LOW:
