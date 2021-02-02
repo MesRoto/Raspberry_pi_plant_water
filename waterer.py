@@ -1,16 +1,21 @@
 import time
 import RPi.GPIO as GPIO
+import Adafruit_ADS1x15
+import math
 
 GPIO.setmode(GPIO.BCM)
 
 
 class Watererer:
-    def __init__(self, measure_pin=14, water_pin=7):
+    def __init__(self, measure_pin=14, water_pin=7, sensor_gain=1):
+        self.gain = sensor_gain
+        self.adc = Adafruit_ADS1x15.ADS1x15()
         self.file = "sensordata"
         self.time = time.time()
         self.measure_pin = measure_pin
         self.water_pin = water_pin
         self.mode = "seconds"
+        self.measure_values = 100
 
     def start(self):
         self.main_loop()
@@ -27,17 +32,11 @@ class Watererer:
             print(ts, reading)
 
     def measure(self):
-        counter = 0
-        start_time = time.time()
-        #Discharge
-        GPIO.setup(self.measure_pin, GPIO.OUT)
-        GPIO.output(self.measure_pin, GPIO.LOW)
-        time.sleep(0.1)
-        GPIO.setup(self.measure_pin, GPIO.IN)
-        while GPIO.input(self.measure_pin) == GPIO.LOW:
-            counter += 1
-        end_time = time.time()
-        return start_time - end_time
+        values = []
+        for i in range(self.measure_values):
+            values[i] = self.adc.read_adc(0, self.gain)
+        mean = sum(values) / self.measure_values
+        return mean
 
     def water(self, seconds):
         if self.mode == "seconds":
