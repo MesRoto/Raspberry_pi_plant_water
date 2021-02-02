@@ -4,5 +4,5 @@ app = Flask(__name__)
 from waterer import Watererer
 
 if __name__ == "__main__":
-    water = Watererer
+    water = Watererer()
     water.start()
